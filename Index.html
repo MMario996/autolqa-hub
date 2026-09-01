@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoLQA Hub</title>
+  <base target="_top">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #FFD100; --primary-hover: #f0c400; --primary-text: #111;
+      --bg: #ffffff; --surface: #ffffff; --surface2: #F9FAFB;
+      --bdr: #E5E7EB; --bdr2: #F3F4F6;
+      --t1: #111827; --t2: #6B7280; --t3: #9CA3AF;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+      --green: #059669; --green-bg: #ECFDF5;
+      --red: #DC2626;   --red-bg: #FEF2F2;
+      --amber: #D97706; --amber-bg: #FFFBEB;
+      --blue: #2563EB;  --blue-bg: #EFF6FF;
+      --purple: #7C3AED;--purple-bg: #F5F3FF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--t1); height: 100vh; display: flex; flex-direction: column; overflow: hidden; font-size: 13px; line-height: 1.5; }
+    .topnav { height: 56px; background: var(--bg); border-bottom: 1px solid var(--bdr); display: flex; align-items: center; padding: 0 20px; flex-shrink: 0; }
+    .nav-tabs { display: flex; align-items: stretch; height: 100%; gap: 2px; flex: 1; }
+    .nav-tab { display: flex; align-items: center; gap: 6px; padding: 0 14px; font-size: 13px; font-weight: 500; color: var(--t2); cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; white-space: nowrap; user-select: none; }
+    .nav-tab:hover { color: var(--t1); background: var(--surface2); }
+    .nav-tab.active { color: var(--t1); border-bottom-color: var(--primary); font-weight: 600; }
+    .nav-tab .material-icons-outlined { font-size: 16px; }
+    .nav-actions { display: flex; align-items: center; gap: 8px; border-left: 1px solid var(--bdr); padding-left: 16px; margin-left: 8px; }
+    .subbar { height: 48px; background: var(--surface2); border-bottom: 1px solid var(--bdr); display: flex; align-items: center; padding: 0 20px; gap: 8px; flex-shrink: 0; }
+    .subbar-title { font-size: 14px; font-weight: 600; color: var(--t1); flex: 1; }
+    .content { flex: 1; overflow-y: auto; padding: 20px; }
+    .view { display: none; }
+    .view.active { display: block; }
+    .toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .input { padding: 7px 11px; font-size: 13px; border: 1px solid var(--bdr); border-radius: var(--radius); background: var(--surface); color: var(--t1); outline: none; font-family: inherit; transition: border-color .15s; }
+    .input:focus { border-color: #9CA3AF; }
+    .select { padding: 7px 11px; font-size: 13px; border: 1px solid var(--bdr); border-radius: var(--radius); background: var(--surface); color: var(--t1); outline: none; font-family: inherit; cursor: pointer; width: 100%; }
+    .textarea { padding: 8px 11px; font-size: 12px; border: 1px solid var(--bdr); border-radius: var(--radius); background: var(--surface); color: var(--t1); outline: none; font-family: 'Courier New', monospace; transition: border-color .15s; width: 100%; resize: vertical; line-height: 1.6; }
+    .textarea:focus { border-color: #9CA3AF; }
+    .btn { border: none; padding: 7px 13px; font-size: 12px; font-weight: 600; border-radius: var(--radius); cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-family: inherit; transition: all .15s; white-space: nowrap; }
+    .btn .material-icons-outlined { font-size: 15px; }
+    .btn-primary   { background: var(--primary); color: var(--primary-text); }
+    .btn-primary:hover   { background: var(--primary-hover); }
+    .btn-secondary { background: var(--surface); color: var(--t1); border: 1px solid var(--bdr); }
+    .btn-secondary:hover { background: var(--surface2); }
+    .btn-danger    { background: var(--red-bg); color: var(--red); border: 1px solid #FECACA; }
+    .btn-danger:hover    { background: #FEE2E2; }
+    .btn-success   { background: var(--green-bg); color: var(--green); border: 1px solid #A7F3D0; }
+    .btn-success:hover   { background: #D1FAE5; }
+    .btn-ghost { background: none; border: none; color: var(--t2); cursor: pointer; padding: 6px; border-radius: var(--radius); display: inline-flex; align-items: center; transition: all .15s; }
+    .btn-ghost:hover { background: var(--surface2); color: var(--t1); }
+    .btn-ghost .material-icons-outlined { font-size: 16px; }
+    .btn-sm  { padding: 5px 10px; font-size: 11px; }
+    .btn-xs  { padding: 3px 8px; font-size: 11px; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--bdr); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+    .stat-val { font-size: 24px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+    .stat-label { font-size: 11px; color: var(--t2); font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; }
+    .badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .badge-green  { background: var(--green-bg);  color: var(--green); }
+    .badge-red    { background: var(--red-bg);    color: var(--red); }
+    .badge-amber  { background: var(--amber-bg);  color: var(--amber); }
+    .badge-blue   { background: var(--blue-bg);   color: var(--blue); }
+    .badge-purple { background: var(--purple-bg); color: var(--purple); }
+    .badge-grey   { background: var(--surface2);  color: var(--t2); border: 1px solid var(--bdr); }
+    .tbl-card { background: var(--surface); border: 1px solid var(--bdr); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px; }
+    .tbl-card-header { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--bdr); background: var(--surface2); }
+    .tbl-card-header h3 { font-size: 13px; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: var(--surface2); padding: 10px 14px; font-weight: 600; font-size: 11px; color: var(--t2); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--bdr); text-align: left; white-space: nowrap; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--bdr2); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover td { background: var(--surface2); }
+    .tbl-empty { text-align: center; color: var(--t3); padding: 40px; font-size: 13px; cursor: default; }
+    .mono { font-family: 'Courier New', monospace; font-size: 11px; color: var(--t3); }
+    .settings-layout { display: grid; grid-template-columns: 180px 1fr; gap: 16px; }
+    .settings-nav { display: flex; flex-direction: column; gap: 2px; }
+    .settings-nav-item { padding: 9px 14px; font-size: 12px; font-weight: 500; color: var(--t2); cursor: pointer; border-radius: var(--radius); border: 1px solid transparent; transition: all .15s; }
+    .settings-nav-item:hover { background: var(--surface2); color: var(--t1); }
+    .settings-nav-item.active { background: var(--amber-bg); color: var(--amber); border-color: rgba(217,119,6,.2); font-weight: 600; }
+    .settings-panel { display: none; }
+    .settings-panel.active { display: block; }
+    .settings-card { background: var(--surface); border: 1px solid var(--bdr); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; }
+    .settings-card h4 { font-size: 12px; font-weight: 600; color: var(--t2); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--bdr); }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-row { margin-bottom: 14px; }
+    .form-row label { display: block; font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 5px; }
+    .form-hint { font-size: 11px; color: var(--t3); margin-top: 4px; }
+    .notice { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: var(--radius); border: 1px solid; margin-bottom: 14px; font-size: 12px; }
+    .notice .material-icons-outlined { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .notice-info    { background: var(--blue-bg);   border-color: #BFDBFE; color: var(--blue); }
+    .notice-warn    { background: var(--amber-bg);  border-color: #FDE68A; color: var(--amber); }
+    .notice-success { background: var(--green-bg);  border-color: #A7F3D0; color: var(--green); }
+    .notice-error   { background: var(--red-bg);    border-color: #FECACA; color: var(--red); }
+    .pe-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 14px; }
+    .pe-cat { border: 1px solid var(--bdr); border-radius: var(--radius); overflow: hidden; }
+    .pe-cat-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--surface2); border-bottom: 1px solid var(--bdr); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--amber); }
+    .pe-cat-header input[type="checkbox"] { accent-color: var(--amber); cursor: pointer; }
+    .pe-cat-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; }
+    .pe-sub-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; }
+    .pe-sub-row label { display: flex; align-items: center; gap: 7px; cursor: pointer; flex: 1; color: var(--t2); }
+    .pe-sub-row input[type="checkbox"] { accent-color: var(--amber); cursor: pointer; }
+    .pe-sub-row input[type="number"] { width: 58px; text-align: center; padding: 3px 6px; font-size: 11px; background: var(--surface2); border: 1px solid var(--bdr); color: var(--t1); border-radius: 4px; font-family: 'Courier New', monospace; }
+    .pe-sev-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+    .pe-sev-item { text-align: center; background: var(--surface2); padding: 14px 10px; border: 1px solid var(--bdr); border-radius: var(--radius); }
+    .pe-sev-item label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--t3); margin-bottom: 8px; }
+    .pe-sev-item input { width: 100%; text-align: center; padding: 7px; background: var(--surface); border: 1px solid var(--bdr); color: var(--t1); border-radius: var(--radius); font-family: 'Courier New', monospace; font-size: 14px; font-weight: 700; }
+    .issue-card { background: var(--surface); border: 1px solid var(--bdr); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; box-shadow: var(--shadow); }
+    .issue-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px; flex-wrap: wrap; }
+    .issue-seg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--surface2); border: 1px solid var(--bdr); border-radius: var(--radius); padding: 12px; margin-bottom: 12px; font-size: 12px; }
+    .issue-seg-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--t3); margin-bottom: 5px; }
+    .issue-reasoning { background: var(--amber-bg); border: 1px solid #FDE68A; border-radius: var(--radius); padding: 10px 12px; font-size: 12px; color: var(--amber); margin-bottom: 10px; line-height: 1.5; }
+    .issue-suggestion { background: var(--green-bg); border: 1px solid #A7F3D0; border-radius: var(--radius); padding: 10px 12px; font-size: 12px; color: var(--green); margin-bottom: 12px; line-height: 1.5; }
+    .issue-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .rc-badge { display: inline-flex; padding: 2px 7px; font-size: 10px; font-weight: 600; border-radius: 20px; background: var(--blue-bg); color: var(--blue); border: 1px solid #BFDBFE; margin-left: 4px; }
+    .rc-badge.pretrans { background: var(--amber-bg); color: var(--amber); border-color: #FDE68A; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 900; display: none; align-items: center; justify-content: center; }
+    .modal-backdrop.open { display: flex; }
+    .modal { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow-md); width: 540px; max-width: 95vw; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; }
+    .modal.modal-wide { width: 900px; }
+    .modal.modal-review { width: 960px; max-height: 92vh; }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--bdr); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--surface2); }
+    .modal-header h2 { font-size: 14px; font-weight: 600; }
+    .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+    .modal-footer { padding: 12px 20px; border-top: 1px solid var(--bdr); display: flex; justify-content: flex-end; gap: 8px; background: var(--surface2); flex-shrink: 0; }
+    .review-modal-header-meta { font-size: 11px; color: var(--t2); font-family: 'Courier New', monospace; margin-top: 3px; }
+    .review-score-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--surface2); border: 1px solid var(--bdr); border-radius: var(--radius); margin-bottom: 16px; }
+    .loader-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.75); z-index: 950; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); flex-direction: column; gap: 16px; }
+    .loader-overlay.show { display: flex; }
+    .loader-box { background: var(--surface); border: 1px solid var(--bdr); border-radius: var(--radius); padding: 28px 36px; text-align: center; box-shadow: var(--shadow-md); }
+    .spinner { border: 3px solid var(--bdr); border-top: 3px solid #888; border-radius: 50%; width: 36px; height: 36px; animation: spin .8s linear infinite; margin: 0 auto 12px; }
+    .spinner-sm { display: inline-block; border: 2px solid var(--bdr); border-top: 2px solid var(--amber); border-radius: 50%; width: 13px; height: 13px; animation: spin .7s linear infinite; vertical-align: middle; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .loader-text { font-size: 13px; color: var(--t2); font-weight: 500; }
+    .progress-track { width: 280px; height: 4px; background: var(--bdr); border-radius: 2px; overflow: hidden; }
+    .progress-fill  { height: 100%; background: var(--primary); width: 0%; transition: width .4s ease-out; border-radius: 2px; }
+    .progress-pct   { font-size: 11px; font-family: 'Courier New', monospace; color: var(--amber); }
+    #toast { position: fixed; bottom: 20px; right: 20px; background: var(--t1); color: #fff; padding: 12px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 500; z-index: 9999; display: none; box-shadow: var(--shadow-md); max-width: 380px; }
+    #toast.show    { display: block; }
+    #toast.success { border-left: 3px solid var(--green); }
+    #toast.error   { border-left: 3px solid var(--red); }
+    #toast.warn    { border-left: 3px solid var(--amber); }
+    #globalErrorBanner { display: none; }
+    #lqaReportModeRow { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader-overlay" id="loaderOverlay">
+  <div class="loader-box">
+    <div class="spinner"></div>
+    <div class="loader-text" id="loaderText">Loading?</div>
+    <div id="loaderProgressWrap" style="display:none; margin-top:12px; flex-direction:column; align-items:center; gap:6px;">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-pct" id="progressPct">0%</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MODAL: LQA START -->
+<div class="modal-backdrop" id="modalLqa">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Start AutoLQA</h2>
+      <button class="btn-ghost" onclick="closeModal('modalLqa')"><i class="material-icons-outlined">close</i></button>
+    </div>
+    <div class="modal-body">
+      <div class="notice notice-info">
+        <i class="material-icons-outlined">play_arrow</i>
+        <strong id="lqaProjectName">?</strong>
+      </div>
+      <div class="form-row">
+        <label>MQM Profile</label>
+        <select class="select" id="lqaProfileSelect"></select>
+      </div>
+      <div class="form-row">
+        <label>Target Language</label>
+        <select class="select" id="lqaTargetLang" onchange="onLangChange()">
+          <option value="all">? Loading languages?</option>
+        </select>
+        <div class="form-hint">Sprachen werden aus den Jobs des Projekts geladen.</div>
+      </div>
+      <div class="form-row" id="lqaReportModeRow">
+        <label>Report Mode</label>
+        <select class="select" id="lqaReportMode">
+          <option value="combined">? Combined ? ein Report f?r alle Sprachen</option>
+          <option value="per_language">? Per Language ? separater Report pro Sprache</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Content Type (Brand Context)</label>
+        <select class="select" id="lqaContentType">
+          <option value="marketing">Marketing</option>
+          <option value="techdoc">Technical</option>
+          <option value="ui">UI / Software</option>
+          <option value="general">General</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Segment-Umfang</label>
+        <select class="select" id="lqaSegmentScope">
+          <option value="full">? Ganzes Dokument (alle Segmente, Batch-Verarbeitung)</option>
+          <option value="30">Schnell ? max. 30 Segmente</option>
+          <option value="100">Standard ? max. 100 Segmente</option>
+          <option value="200">Erweitert ? max. 200 Segmente</option>
+        </select>
+        <div class="form-hint">?Ganzes Dokument" analysiert alle Segmente in Batches. Bei gro?en Projekten dauert dies l?nger.</div>
+      </div>
+      <div class="form-row">
+        <label>Additional Styleguide Notes (optional)</label>
+        <textarea class="textarea" id="lqaNotes" rows="3" placeholder="Project-specific instructions for the AI?"></textarea>
+      </div>
+      <div class="form-row">
+        <label>Include project Term Bases?</label>
+        <select class="select" id="lqaUseTb">
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalLqa')">Cancel</button>
+      <button class="btn btn-primary" onclick="startLQA()"><i class="material-icons-outlined">play_arrow</i>Start LQA</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: LQA SYNC TO PHRASE -->
+<div class="modal-backdrop" id="modalSync">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Sync to Phrase TMS LQA</h2>
+      <button class="btn-ghost" onclick="closeModal('modalSync')"><i class="material-icons-outlined">close</i></button>
+    </div>
+    <div class="modal-body">
+      <div class="notice notice-info">
+        <i class="material-icons-outlined">info</i>
+        <span>Best?tigte Issues werden als natives LQA Assessment in Phrase TMS eingetragen.</span>
+      </div>
+      <div class="notice notice-warn">
+        <i class="material-icons-outlined">warning</i>
+        <span id="syncIssueCountText">?</span>
+      </div>
+      <div class="form-row">
+        <label>Overall Feedback (optional)</label>
+        <textarea class="textarea" id="syncOverallFeedback" rows="4" placeholder="Overall feedback f?r den ?bersetzer?"></textarea>
+        <div class="form-hint">Erscheint als "Overall feedback" im Phrase LQA Assessment.</div>
+      </div>
+      <div class="notice notice-warn">
+        <i class="material-icons-outlined">warning</i>
+        <span>Der Job muss sich in einem <strong>LQA Workflow Step</strong> befinden.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalSync')">Cancel</button>
+      <button class="btn btn-primary" onclick="executeLqaSync()"><i class="material-icons-outlined">upload</i>Sync to Phrase LQA</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PROFILE EDITOR -->
+<div class="modal-backdrop" id="modalProfile">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <h2 id="peModalTitle">MQM Profile Editor</h2>
+      <button class="btn-ghost" onclick="closeModal('modalProfile')"><i class="material-icons-outlined">close</i></button>
+    </div>
+    <div class="modal-body" style="background:var(--surface2);">
+      <div class="form-grid" style="margin-bottom:14px;">
+        <div class="form-row" style="margin-bottom:0;"><label>Profile Name <span style="color:var(--amber);">*</span></label><input class="input" style="width:100%;" type="text" id="peName"></div>
+        <div class="form-row" style="margin-bottom:0;"><label>Description</label><input class="input" style="width:100%;" type="text" id="peDesc"></div>
+      </div>
+      <div class="settings-card" style="margin-bottom:14px;">
+        <h4>Severity Penalties</h4>
+        <div class="pe-sev-grid">
+          <div class="pe-sev-item"><label>Neutral</label><input type="number" step="0.1" min="0" id="peSevNeutral"></div>
+          <div class="pe-sev-item"><label>Minor</label><input type="number" step="0.1" min="0" id="peSevMinor"></div>
+          <div class="pe-sev-item"><label>Major</label><input type="number" step="0.1" min="0" id="peSevMajor"></div>
+          <div class="pe-sev-item"><label>Critical</label><input type="number" step="0.1" min="0" id="peSevCritical"></div>
+        </div>
+      </div>
+      <div class="settings-card" style="margin-bottom:14px;">
+        <h4>Pass/Fail Threshold</h4>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <input type="number" step="0.1" min="0" max="100" id="peThreshold" class="input" style="width:100px; text-align:center;">
+          <span style="font-size:12px; color:var(--t2);">% (score must be ? this value to pass)</span>
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:14px;">
+        <label>Additional Prompt Hints (optional)</label>
+        <textarea class="textarea" id="pePromptExtras" rows="2"></textarea>
+      </div>
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; color:var(--t3); margin-bottom:10px;">MQM Error Categories & Weights</div>
+      <div id="peCategoriesContainer" class="pe-grid"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="peDeleteBtn" onclick="deleteCurrentProfile()" style="margin-right:auto;"><i class="material-icons-outlined">delete_outline</i>Delete profile</button>
+      <button class="btn btn-secondary" onclick="closeModal('modalProfile')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProfileFromEditor()"><i class="material-icons-outlined">save</i>Save profile</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: REVIEW -->
+<div class="modal-backdrop" id="modalReview">
+  <div class="modal modal-review">
+    <div class="modal-header">
+      <div>
+        <h2>LQA Review</h2>
+        <div class="review-modal-header-meta" id="reviewModalMeta"></div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button class="btn btn-secondary btn-sm" onclick="openSyncModal()"><i class="material-icons-outlined">upload</i>Sync to Phrase LQA</button>
+        <button class="btn-ghost" onclick="closeModal('modalReview')"><i class="material-icons-outlined">close</i></button>
+      </div>
+    </div>
+    <div class="modal-body" style="background:var(--surface2);" id="reviewModalContent"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div style="display:flex; flex-direction:column; height:100vh; overflow:hidden;">
+  <nav class="topnav">
+    <div class="nav-tabs">
+      <div class="nav-tab active" onclick="switchView('projects')"><i class="material-icons-outlined">folder_open</i>Projects</div>
+      <div class="nav-tab" onclick="switchView('reports')"><i class="material-icons-outlined">bar_chart</i>LQA Reports</div>
+      <div class="nav-tab" onclick="switchView('analytics')"><i class="material-icons-outlined">analytics</i>Analytics</div>
+      <div class="nav-tab" onclick="switchView('profiles')"><i class="material-icons-outlined">tune</i>MQM Profiles</div>
+      <div class="nav-tab" onclick="switchView('settings')"><i class="material-icons-outlined">settings</i>Settings</div>
+    </div>
+    <div class="nav-actions">
+      <button class="btn-ghost" onclick="reloadCurrentView()" title="Reload"><i class="material-icons-outlined">refresh</i></button>
+    </div>
+  </nav>
+  <div class="subbar">
+    <span class="subbar-title" id="subbarTitle">Projects</span>
+  </div>
+  <div class="content">
+
+    <!-- PROJECTS -->
+    <div id="view-projects" class="view active">
+      <div id="globalErrorBanner" class="notice notice-error" style="display:none; margin-bottom:16px;">
+        <i class="material-icons-outlined">error_outline</i><span id="globalErrorText"></span>
+      </div>
+      <div class="toolbar">
+        <input class="input" id="projSearch" placeholder="Filter projects?" oninput="filterProjects()">
+        <button class="btn btn-secondary btn-sm" onclick="loadProjects()"><i class="material-icons-outlined">refresh</i>Reload</button>
+      </div>
+      <div class="tbl-card">
+        <div class="tbl-card-header"><h3>Phrase Projects</h3><span id="projCount" style="font-size:12px; color:var(--t2);">?</span></div>
+        <table>
+          <thead><tr><th>Project / UID</th><th>Languages</th><th>Status</th><th style="text-align:right; cursor:default;">Action</th></tr></thead>
+          <tbody id="projBody"><tr><td colspan="4" class="tbl-empty"><span class="spinner-sm"></span> Loading?</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="view-reports" class="view">
+      <div class="toolbar">
+        <button class="btn btn-secondary btn-sm" onclick="reloadReports()"><i class="material-icons-outlined">refresh</i>Reload</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportToSheet()"><i class="material-icons-outlined">download</i>Export to Google Sheet</button>
+      </div>
+      <div class="tbl-card">
+        <div class="tbl-card-header"><h3>LQA Reports</h3><span id="repCount" style="font-size:12px; color:var(--t2);">?</span></div>
+        <table>
+          <thead><tr><th>Report ID</th><th>Date</th><th>Project</th><th>Lang</th><th>Profile</th><th>Score</th><th>Issues</th><th style="text-align:right; cursor:default;">Action</th></tr></thead>
+          <tbody id="repBody"><tr><td colspan="8" class="tbl-empty"><span class="spinner-sm"></span> Loading?</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div id="view-analytics" class="view">
+      <div class="notice notice-info" style="margin-bottom:20px;"><i class="material-icons-outlined">info</i><span id="roiInfoText">Calculating?</span></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-val" id="roiTotalWords">?</div><div class="stat-label">Words reviewed</div></div>
+        <div class="stat-card"><div class="stat-val" id="roiTimeSaved">?</div><div class="stat-label">Time saved</div></div>
+        <div class="stat-card" style="border-bottom:2px solid var(--green);"><div class="stat-val" style="color:var(--green);" id="roiMoneySaved">?</div><div class="stat-label">Cost saved (?)</div></div>
+        <div class="stat-card"><div class="stat-val" id="roiTotalReports">?</div><div class="stat-label">LQA runs total</div></div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="tbl-card">
+          <div class="tbl-card-header"><h3>Root Cause Analysis</h3></div>
+          <div style="padding:16px;">
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--bdr2); font-size:13px;"><span style="color:var(--t2);">Production</span><strong id="rcProduction">0</strong></div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; font-size:13px;"><span style="color:var(--t2);">Pre-translation</span><strong id="rcPretrans">0</strong></div>
+          </div>
+        </div>
+        <div class="tbl-card">
+          <div class="tbl-card-header"><h3>Severity Distribution</h3></div>
+          <div style="padding:16px; display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--bdr2);"><span class="badge badge-red">Critical</span><strong id="sevCritical">0</strong></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--bdr2);"><span class="badge badge-amber">Major</span><strong id="sevMajor">0</strong></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0;"><span class="badge badge-blue">Minor</span><strong id="sevMinor">0</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILES -->
+    <div id="view-profiles" class="view">
+      <div class="toolbar">
+        <button class="btn btn-primary btn-sm" onclick="openProfileEditor(null)"><i class="material-icons-outlined">add</i>New profile</button>
+        <button class="btn btn-secondary btn-sm" onclick="resetProfiles()"><i class="material-icons-outlined">restart_alt</i>Reset to defaults</button>
+      </div>
+      <div id="profilesDisplay"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="view-settings" class="view">
+      <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+        <button class="btn btn-primary btn-sm" onclick="saveSettingsUI()"><i class="material-icons-outlined">save</i>Save settings</button>
+      </div>
+      <div class="settings-layout">
+        <div class="settings-nav">
+          <div class="settings-nav-item active" onclick="switchSettingsTab('set-phrase', this)">Phrase TMS</div>
+          <div class="settings-nav-item" onclick="switchSettingsTab('set-engine', this)">AI Engine</div>
+          <div class="settings-nav-item" onclick="switchSettingsTab('set-brand', this)">Brand Context</div>
+          <div class="settings-nav-item" onclick="switchSettingsTab('set-roi', this)">ROI Metrics</div>
+          <div class="settings-nav-item" onclick="switchSettingsTab('set-sync', this)">Sync</div>
+          <div class="settings-nav-item" onclick="switchSettingsTab('set-db', this)">Database</div>
+        </div>
+        <div>
+          <div id="set-phrase" class="settings-panel active">
+            <div class="settings-card"><h4>Phrase TMS Configuration</h4>
+              <div class="form-grid">
+                <div class="form-row" style="margin-bottom:0;"><label>Default Termbase</label><select class="select" id="s_defaultTbUid"></select></div>
+                <div class="form-row" style="margin-bottom:0;"><label>Projects limit</label><input type="number" class="input" style="width:100%;" id="s_defaultProjectCount"></div>
+                <div class="form-row" style="margin-bottom:0;"><label>Max segments / LQA run</label><input type="number" class="input" style="width:100%;" id="s_phraseMaxSegments"><div class="form-hint">Wird ?berschrieben durch ?Segment-Umfang" im LQA-Dialog. 0 = kein Limit.</div></div>
+                <div class="form-row" style="margin-bottom:0;"><label>TM threshold (0.0?1.0)</label><input type="number" step="0.05" class="input" style="width:100%;" id="s_tmThreshold"></div>
+                <div class="form-row" style="margin-bottom:0;"><label>TB lookup limit / segment</label><input type="number" class="input" style="width:100%;" id="s_tbLookupLimit"></div>
+                <div class="form-row" style="margin-bottom:0;"><label>TB n-gram max (1?3)</label><input type="number" class="input" style="width:100%;" id="s_tbMaxNgram" min="1" max="3"></div>
+              </div>
+            </div>
+          </div>
+          <div id="set-engine" class="settings-panel">
+            <div class="settings-card"><h4>AI Engine & Model</h4>
+              <div class="form-grid">
+                <div class="form-row" style="margin-bottom:0;"><label>Primary AI model</label><select class="select" id="s_primaryModel"><option value="gemini-2.5-pro">Gemini 2.5 Pro</option><option value="gemini-2.5-flash">Gemini 2.5 Flash</option></select></div>
+                <div class="form-row" style="margin-bottom:0;"><label>Max output tokens</label><input type="number" class="input" style="width:100%;" id="s_maxTokens" min="1024" max="65536" step="1024"><div class="form-hint">Recommended: 32768.</div></div>
+                <div class="form-row" style="margin-bottom:0;"><label>Temperature Pass 1</label><input type="number" step="0.05" class="input" style="width:100%;" id="s_tempPass1"></div>
+                <div class="form-row" style="margin-bottom:0;"><label>Enable Double-Pass</label><select class="select" id="s_doublePassEnabled"><option value="true">Yes</option><option value="false">No</option></select></div>
+                <div class="form-row" style="margin-bottom:0;"><label>Double-Pass threshold</label><input type="number" class="input" style="width:100%;" id="s_doublePassThreshold"></div>
+              </div>
+            </div>
+          </div>
+          <div id="set-brand" class="settings-panel">
+            <div class="settings-card">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--bdr);">
+                <h4 style="margin-bottom:0; border-bottom:none; padding-bottom:0;">K?rcher Brand Context Prompts</h4>
+                <button class="btn btn-secondary btn-sm" onclick="resetKaercherPromptsUI()"><i class="material-icons-outlined">restart_alt</i>Reset</button>
+              </div>
+              <div class="notice notice-info" style="margin-bottom:14px;"><i class="material-icons-outlined">info</i><span>Universal always applies. Content-type blocks are added at LQA start.</span></div>
+              <div class="form-row"><label>General</label><textarea class="textarea" id="s_brandContextUniversal" rows="10"></textarea></div>
+              <div class="form-row"><label>Marketing</label><textarea class="textarea" id="s_brandContextMarketing" rows="8"></textarea></div>
+              <div class="form-row"><label>Technical Documentation</label><textarea class="textarea" id="s_brandContextTechdoc" rows="8"></textarea></div>
+              <div class="form-row"><label>Software</label><textarea class="textarea" id="s_brandContextUi" rows="8"></textarea></div>
+            </div>
+          </div>
+          <div id="set-roi" class="settings-panel">
+            <div class="settings-card"><h4>ROI Calculation</h4>
+              <div class="form-grid">
+                <div class="form-row" style="margin-bottom:0;"><label>Review speed (words/h)</label><input type="number" class="input" style="width:100%;" id="s_roiWordsPerHour"></div>
+                <div class="form-row" style="margin-bottom:0;"><label>Hourly rate (?)</label><input type="number" class="input" style="width:100%;" id="s_roiHourlyRate"></div>
+              </div>
+            </div>
+          </div>
+          <div id="set-sync" class="settings-panel">
+            <div class="settings-card"><h4>Sync & Notifications</h4>
+              <div class="form-row"><label>Comment prefix</label><input type="text" class="input" style="width:100%;" id="s_commentPrefix"></div>
+            </div>
+          </div>
+          <div id="set-db" class="settings-panel">
+            <div class="settings-card"><h4>Google Sheets Database</h4>
+              <p style="font-size:12px; color:var(--t2); margin-bottom:16px;">All data stored in Google Sheets.</p>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-primary btn-sm" onclick="openDatabaseSheet()"><i class="material-icons-outlined">open_in_new</i>Open Sheet</button>
+                <button class="btn btn-danger btn-sm" onclick="recreateDb()"><i class="material-icons-outlined">warning</i>Re-link Sheet</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var rawProjects = [], lqaProfiles = [], appSettings = {}, allReports = [];
+var currentProjectId = null, currentReport = null, editingProfile = null;
+var progressInterval = null, pollingStartTime = null;
+var currentView = 'projects';
+
+var MQM_BLUEPRINT = {
+  name: 'New MQM Profile', description: 'Custom LQA profile',
+  passThreshold: 99.0, promptExtras: '',
+  severityPenalties: { Neutral: 0, Minor: 1.0, Major: 5.0, Critical: 10.0 },
+  categories: [
+    { name: 'ACCURACY', enabled: true, subcategories: [
+      {name:'Accuracy',enabled:true,weight:1.0},{name:'Addition',enabled:true,weight:1.0},
+      {name:'Improper exact TM match',enabled:true,weight:1.0},{name:'Mistranslation',enabled:true,weight:1.0},
+      {name:'Omission',enabled:true,weight:1.0},{name:'Over-translation',enabled:true,weight:1.0},
+      {name:'Under-translation',enabled:true,weight:1.0},{name:'Untranslated',enabled:true,weight:1.0}
+    ]},
+    { name: 'FLUENCY', enabled: true, subcategories: [
+      {name:'Character encoding',enabled:false,weight:1.0},{name:'Fluency',enabled:true,weight:1.0},
+      {name:'Grammar',enabled:true,weight:1.0},{name:'Inconsistency',enabled:true,weight:1.0},
+      {name:'Punctuation',enabled:true,weight:1.0},{name:'Spelling',enabled:true,weight:1.0}
+    ]},
+    { name: 'TERMINOLOGY', enabled: true, subcategories: [
+      {name:'Inconsistent use of terminology',enabled:true,weight:1.5},
+      {name:'Inconsistent with termbase',enabled:true,weight:1.5},
+      {name:'Terminology',enabled:true,weight:1.5}
+    ]},
+    { name: 'STYLE', enabled: true, subcategories: [
+      {name:'Awkward',enabled:true,weight:1.0},{name:'Style',enabled:true,weight:1.0},
+      {name:'Unidiomatic',enabled:true,weight:1.0}
+    ]},
+    { name: 'LOCALIZATION-SPECIFIC', enabled: false, subcategories: [
+      {name:'Address format',enabled:true,weight:1.0},{name:'Currency format',enabled:true,weight:1.0},
+      {name:'Date format',enabled:true,weight:1.0},{name:'Measurement format',enabled:true,weight:1.0}
+    ]},
+    { name: 'DESIGN & OTHER', enabled: false, subcategories: [
+      {name:'Design',enabled:true,weight:1.0},{name:'Length',enabled:true,weight:1.0},
+      {name:'Markup',enabled:true,weight:1.0},{name:'Other',enabled:true,weight:1.0}
+    ]}
+  ]
+};
+
+var viewTitles = { projects:'Projects', reports:'LQA Reports', analytics:'Analytics & ROI', profiles:'MQM Profiles', settings:'Settings' };
+
+/* ?? INIT ?? */
+window.onload = function() {
+  showLoader('Connecting to Phrase API?');
+  var timeout = setTimeout(function() { hideLoader(); showGlobalError('Initialization >30s.'); }, 30000);
+  runGas('getAppSettings', [], function(res) {
+    appSettings = (res && res.success) ? (res.settings || {}) : {};
+    populateSettingsUI();
+    runGas('getAllTermBases', [], function(tbs) {
+      if (tbs && tbs.success) {
+        var sel = document.getElementById('s_defaultTbUid');
+        sel.innerHTML = '<option value="">? None ?</option>';
+        tbs.termbases.forEach(function(tb) { var o = document.createElement('option'); o.value = tb.uid; o.text = tb.name; sel.appendChild(o); });
+        sel.value = appSettings.defaultTbUid || '';
+      }
+    });
+    runGas('getLQAProfiles', [], function(profs) {
+      lqaProfiles = (profs && profs.profiles) || [];
+      renderProfiles();
+      // Reports immer frisch aus DB laden
+      runGas('getAllReportsFromDb', [], function(reps) {
+        allReports = (reps && reps.reports) ? reps.reports : [];
+        renderReports();
+        renderAnalytics();
+        runGas('getActiveProjects', [], function(projs) {
+          clearTimeout(timeout); hideLoader();
+          if (projs && projs.success) {
+            rawProjects = projs.projects || [];
+            document.getElementById('projCount').textContent = rawProjects.length + ' projects';
+            renderProjects();
+          } else { showGlobalError('Projects error: ' + (projs ? projs.error : 'unknown')); }
+        });
+      });
+    });
+  });
+};
+
+function runGas(fn, args, cb) {
+  var runner = google.script.run
+    .withSuccessHandler(function(r) { try { cb(r); } catch(e) { console.error(e); } })
+    .withFailureHandler(function(e) { hideLoader(); toast('Backend error: ' + (e.message || e), 'error'); });
+  runner[fn].apply(runner, args || []);
+}
+
+/* ?? NAVIGATION ?? */
+function switchView(id) {
+  document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+  document.querySelectorAll('.nav-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById('view-' + id).classList.add('active');
+  document.querySelector('.nav-tab[onclick="switchView(\'' + id + '\')"]').classList.add('active');
+  document.getElementById('subbarTitle').textContent = viewTitles[id] || id;
+  currentView = id;
+  // Reports-Tab: immer frisch aus DB laden beim Wechsel
+  if (id === 'reports') reloadReports();
+  if (id === 'analytics') renderAnalytics();
+}
+
+function reloadCurrentView() {
+  if (currentView === 'projects') loadProjects();
+  else if (currentView === 'reports') reloadReports();
+  else if (currentView === 'analytics') renderAnalytics();
+}
+
+function switchSettingsTab(id, el) {
+  document.querySelectorAll('.settings-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.settings-nav-item').forEach(function(i) { i.classList.remove('active'); });
+  document.getElementById(id).classList.add('active'); el.classList.add('active');
+}
+
+/* ?? REPORTS LADEN ?? */
+function reloadReports() {
+  document.getElementById('repBody').innerHTML = '<tr><td colspan="8" class="tbl-empty"><span class="spinner-sm"></span> Loading?</td></tr>';
+  runGas('getAllReportsFromDb', [], function(r) {
+    allReports = (r && r.reports) ? r.reports : [];
+    renderReports();
+    renderAnalytics();
+  });
+}
+
+/* ?? EXPORT ?? */
+function exportToSheet() {
+  showLoader('Erstelle Export-Tab im Google Sheet?');
+  runGas('exportReportsToSheet', [], function(r) {
+    hideLoader();
+    if (r && r.success) {
+      toast('Export erstellt!', 'success');
+      window.open(r.url, '_blank');
+    } else {
+      toast('Export Fehler: ' + (r ? r.error : 'unknown'), 'error');
+    }
+  });
+}
+
+/* ?? PROJECTS ?? */
+function loadProjects() {
+  showLoader('Loading projects?');
+  runGas('getActiveProjects', [], function(r) {
+    hideLoader();
+    if (r && r.success) { rawProjects = r.projects || []; document.getElementById('projCount').textContent = rawProjects.length + ' projects'; renderProjects(); toast('Reloaded.', 'success'); }
+    else toast('Error: ' + (r ? r.error : 'unknown'), 'error');
+  });
+}
+
+function renderProjects() {
+  var tbody = document.getElementById('projBody');
+  if (!rawProjects.length) { tbody.innerHTML = '<tr><td colspan="4" class="tbl-empty">No projects found.</td></tr>'; return; }
+  tbody.innerHTML = rawProjects.map(function(p) {
+    return '<tr><td><span style="font-weight:500;">' + esc(p.name) + '</span><div class="mono">' + esc(p.id) + '</div></td>' +
+      '<td><span class="badge badge-blue">' + esc(p.source) + '</span> ? <span style="font-size:12px; color:var(--t2);">' + esc(p.target) + '</span></td>' +
+      '<td><span class="badge badge-grey">' + esc(p.status) + '</span></td>' +
+      '<td style="text-align:right;"><button class="btn btn-primary btn-xs" onclick="openLQAModal(\'' + esc(p.id) + '\',\'' + esc(p.name).replace(/'/g,"\\'") + '\')"><i class="material-icons-outlined">play_arrow</i>AutoLQA</button></td></tr>';
+  }).join('');
+}
+
+function filterProjects() {
+  var q = (document.getElementById('projSearch').value || '').toLowerCase();
+  var list = q ? rawProjects.filter(function(p) { return p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q); }) : rawProjects;
+  var tbody = document.getElementById('projBody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="4" class="tbl-empty">No match.</td></tr>'; return; }
+  tbody.innerHTML = list.map(function(p) {
+    return '<tr><td><span style="font-weight:500;">' + esc(p.name) + '</span><div class="mono">' + esc(p.id) + '</div></td>' +
+      '<td><span class="badge badge-blue">' + esc(p.source) + '</span> ? <span style="font-size:12px;color:var(--t2);">' + esc(p.target) + '</span></td>' +
+      '<td><span class="badge badge-grey">' + esc(p.status) + '</span></td>' +
+      '<td style="text-align:right;"><button class="btn btn-primary btn-xs" onclick="openLQAModal(\'' + esc(p.id) + '\',\'' + esc(p.name).replace(/'/g,"\\'") + '\')"><i class="material-icons-outlined">play_arrow</i>AutoLQA</button></td></tr>';
+  }).join('');
+}
+
+function showGlobalError(msg) {
+  var b = document.getElementById('globalErrorBanner');
+  if (b) { b.style.display = 'flex'; document.getElementById('globalErrorText').textContent = msg; }
+}
+
+/* ?? LQA MODAL ?? */
+function openLQAModal(id, name) {
+  currentProjectId = id;
+  document.getElementById('lqaProjectName').textContent = name;
+  var sel = document.getElementById('lqaProfileSelect');
+  sel.innerHTML = '';
+  lqaProfiles.forEach(function(p) { var o = document.createElement('option'); o.value = p.id; o.text = p.name; sel.appendChild(o); });
+  document.getElementById('lqaNotes').value = '';
+  document.getElementById('lqaReportModeRow').style.display = 'none';
+  document.getElementById('lqaSegmentScope').value = 'full';
+
+  var langSel = document.getElementById('lqaTargetLang');
+  langSel.innerHTML = '<option value="all">? Loading?</option>';
+  langSel.disabled = true;
+
+  runGas('getTargetLangsForProject', [id], function(r) {
+    langSel.disabled = false;
+    langSel.innerHTML = '<option value="all">All languages</option>';
+    if (r && r.success && r.langs.length > 0) {
+      r.langs.forEach(function(lang) {
+        var o = document.createElement('option'); o.value = lang; o.text = lang; langSel.appendChild(o);
+      });
+    }
+  });
+
+  openModal('modalLqa');
+}
+
+function onLangChange() {
+  var val = document.getElementById('lqaTargetLang').value;
+  document.getElementById('lqaReportModeRow').style.display = val === 'all' ? 'block' : 'none';
+}
+
+function startLQA() {
+  closeModal('modalLqa');
+  var prof        = document.getElementById('lqaProfileSelect').value;
+  var notes       = document.getElementById('lqaNotes').value;
+  var useTb       = document.getElementById('lqaUseTb').value === 'true';
+  var contentType = document.getElementById('lqaContentType').value;
+  var targetLang  = document.getElementById('lqaTargetLang').value;
+  var reportMode  = document.getElementById('lqaReportMode').value;
+  var scopeVal    = document.getElementById('lqaSegmentScope').value;
+  // 'full' ? 0 (kein Limit), sonst Zahl
+  var segLimit    = scopeVal === 'full' ? 0 : parseInt(scopeVal);
+  var taskId      = 'task_' + Date.now();
+
+  pollingStartTime = Date.now();
+  showLoader('AutoLQA running?', true);
+
+  progressInterval = setInterval(function() {
+    if (Date.now() - pollingStartTime > 540000) { // 9 Min Timeout (Batches k?nnen l?nger dauern)
+      clearInterval(progressInterval); hideLoader(); toast('Timeout ? Dokument m?glicherweise zu gro?.', 'error'); return;
+    }
+    google.script.run
+      .withSuccessHandler(function(res) { if (res && res.progress !== undefined) updateProgress(res.message || 'Working?', res.progress); })
+      .withFailureHandler(function() {})
+      .getTaskProgress(taskId);
+  }, 2000);
+
+  google.script.run
+    .withSuccessHandler(function(r) {
+      clearInterval(progressInterval); hideLoader();
+      if (r.success) {
+        var reports = r.reports || [r.report];
+        reports.forEach(function(rep) { if (rep) allReports.unshift(rep); });
+        renderReports(); renderAnalytics();
+        switchView('reports');
+        if (reports[0]) openReview(reports[0].reportId);
+        var msg = reports.length > 1
+          ? reports.length + ' Reports erstellt (per language).'
+          : 'LQA complete ? Score: ' + (reports[0] ? reports[0].score : '?') + '% (' + (reports[0] && reports[0]._batchCount > 1 ? reports[0]._batchCount + ' Batches' : '1 Pass') + ')';
+        toast(msg, 'success');
+      } else { toast('AI error: ' + r.error, 'error'); }
+    })
+    .withFailureHandler(function(e) { clearInterval(progressInterval); hideLoader(); toast('Error: ' + e.message, 'error'); })
+    .runGeminiAutoLQA(currentProjectId, prof, notes, segLimit, null, useTb, taskId, contentType, targetLang, reportMode);
+}
+
+/* ?? REPORTS ?? */
+function renderReports() {
+  var count = allReports ? allReports.length : 0;
+  document.getElementById('repCount').textContent = count + ' reports';
+  var tbody = document.getElementById('repBody');
+  if (!count) { tbody.innerHTML = '<tr><td colspan="8" class="tbl-empty">No reports. Start a LQA run from the Projects tab.</td></tr>'; return; }
+  tbody.innerHTML = allReports.map(function(r) {
+    var passed = r.passed || r.score >= (r.passThreshold || 99);
+    var langBadge = r.targetLang && r.targetLang !== 'all'
+      ? '<span class="badge badge-blue">' + esc(r.targetLang) + '</span>'
+      : '<span class="badge badge-grey">all</span>';
+    return '<tr onclick="openReview(\'' + esc(r.reportId) + '\')">' +
+      '<td class="mono">' + esc(r.reportId) + '</td>' +
+      '<td style="color:var(--t2); font-size:12px;">' + esc(String(r.date || '').substring(0,10)) + '</td>' +
+      '<td style="font-weight:500;">' + esc(r.projectName) + '</td>' +
+      '<td>' + langBadge + '</td>' +
+      '<td><span class="badge badge-purple">' + esc(r.profileName) + '</span></td>' +
+      '<td><span class="badge ' + (passed ? 'badge-green' : 'badge-red') + '">' + r.score + '%</span></td>' +
+      '<td style="color:var(--t2);">' + ((r.issues || []).length) + '</td>' +
+      '<td style="text-align:right;"><button class="btn btn-secondary btn-xs"><i class="material-icons-outlined">open_in_new</i>Review</button></td>' +
+    '</tr>';
+  }).join('');
+}
+
+/* ?? ANALYTICS ?? */
+function renderAnalytics() {
+  var totalWords = 0, preTrans = 0, prod = 0, sevC = 0, sevM = 0, sevMn = 0;
+  (allReports || []).forEach(function(r) {
+    totalWords += parseInt(r.totalWords) || 0;
+    (r.issues || []).forEach(function(i) {
+      if (i.rootCause === 'Pre-translation') preTrans++; else prod++;
+      var s = (i.severity || '').toLowerCase();
+      if (s === 'critical') sevC++; else if (s === 'major') sevM++; else if (s === 'minor') sevMn++;
+    });
+  });
+  var wph = parseFloat(appSettings.roiWordsPerHour) || 2500;
+  var rate = parseFloat(appSettings.roiHourlyRate) || 50;
+  var hoursSaved = wph > 0 ? (totalWords / wph).toFixed(1) : 0;
+  document.getElementById('roiTotalWords').textContent   = totalWords.toLocaleString('de-DE');
+  document.getElementById('roiTimeSaved').textContent    = hoursSaved + ' h';
+  document.getElementById('roiMoneySaved').textContent   = Math.round(hoursSaved * rate).toLocaleString('de-DE') + ' ?';
+  document.getElementById('roiTotalReports').textContent = (allReports || []).length;
+  document.getElementById('roiInfoText').textContent     = 'Basis: ' + wph.toLocaleString('de-DE') + ' words/h ? ' + rate + ' ?/h';
+  document.getElementById('rcProduction').textContent    = prod;
+  document.getElementById('rcPretrans').textContent      = preTrans;
+  document.getElementById('sevCritical').textContent     = sevC;
+  document.getElementById('sevMajor').textContent        = sevM;
+  document.getElementById('sevMinor').textContent        = sevMn;
+}
+
+/* ?? SETTINGS ?? */
+function populateSettingsUI() {
+  var keys = ['defaultProjectCount','phraseMaxSegments','tmThreshold','tbLookupLimit','tbMaxNgram',
+    'primaryModel','maxTokens','tempPass1','doublePassEnabled','doublePassThreshold',
+    'commentPrefix','roiWordsPerHour','roiHourlyRate',
+    'brandContextUniversal','brandContextMarketing','brandContextTechdoc','brandContextUi'];
+  keys.forEach(function(k) { var el = document.getElementById('s_' + k); if (el && appSettings[k] !== undefined) el.value = appSettings[k]; });
+}
+
+function saveSettingsUI() {
+  var keys = ['defaultTbUid','defaultProjectCount','phraseMaxSegments','tmThreshold','tbLookupLimit','tbMaxNgram',
+    'primaryModel','maxTokens','tempPass1','doublePassEnabled','doublePassThreshold',
+    'commentPrefix','roiWordsPerHour','roiHourlyRate',
+    'brandContextUniversal','brandContextMarketing','brandContextTechdoc','brandContextUi'];
+  keys.forEach(function(k) { var el = document.getElementById('s_' + k); if (el) appSettings[k] = el.value; });
+  showLoader('Saving?');
+  runGas('saveAppSettings', [appSettings], function(r) { hideLoader(); if (r && r.success) { toast('Saved.', 'success'); renderAnalytics(); } else toast('Error: ' + (r ? r.error : 'unknown'), 'error'); });
+}
+
+function resetKaercherPromptsUI() {
+  if (!confirm('Reset Brand Context prompts?')) return;
+  showLoader('Resetting?');
+  runGas('resetKaercherPrompts', [], function(r) { hideLoader(); if (r && r.success) { appSettings = r.settings; populateSettingsUI(); toast('Reset.', 'success'); } else toast('Error.', 'error'); });
+}
+
+function openDatabaseSheet() { runGas('getDatabaseUrl', [], function(r) { if (r && r.success) window.open(r.url, '_blank'); }); }
+function recreateDb() { if (!confirm('Re-link DB?')) return; showLoader('?'); runGas('recreateDatabase', [], function(r) { hideLoader(); if (r && r.success) { window.open(r.url, '_blank'); toast('Done.', 'success'); } }); }
+
+/* ?? PROFILES ?? */
+function renderProfiles() {
+  var sel = document.getElementById('lqaProfileSelect');
+  if (sel) { sel.innerHTML = ''; lqaProfiles.forEach(function(p) { var o = document.createElement('option'); o.value = p.id; o.text = p.name; sel.appendChild(o); }); }
+  var disp = document.getElementById('profilesDisplay');
+  if (!disp) return;
+  if (!lqaProfiles.length) { disp.innerHTML = '<div class="tbl-empty">No profiles.</div>'; return; }
+  disp.innerHTML = lqaProfiles.map(function(p) {
+    var catCount = p.categories.filter(function(c) { return c.enabled; }).length;
+    var subCount = p.categories.reduce(function(a,c) { return a + c.subcategories.filter(function(s){return s.enabled;}).length; }, 0);
+    return '<div class="tbl-card" style="margin-bottom:12px;"><div class="tbl-card-header"><h3>' + esc(p.name) + '</h3>' +
+      '<button class="btn btn-secondary btn-sm" onclick="openProfileEditor(\'' + esc(p.id) + '\')"><i class="material-icons-outlined">edit</i>Edit</button></div>' +
+      '<div style="padding:12px 16px; display:flex; gap:24px; font-size:12px;"><span style="color:var(--t2);">' + esc(p.description) + '</span>' +
+      '<span class="badge badge-grey">Threshold: ' + p.passThreshold + '%</span>' +
+      '<span class="badge badge-grey">' + catCount + ' cats</span>' +
+      '<span class="badge badge-grey">' + subCount + ' subs</span></div></div>';
+  }).join('');
+}
+
+function resetProfiles() { if (!confirm('Reset profiles?')) return; showLoader('?'); runGas('resetLQAProfiles', [], function(r) { hideLoader(); lqaProfiles = r.profiles || []; renderProfiles(); toast('Reset.', 'success'); }); }
+
+function openProfileEditor(id) {
+  if (id) { editingProfile = JSON.parse(JSON.stringify(lqaProfiles.find(function(p) { return p.id === id; }))); document.getElementById('peModalTitle').textContent = 'Edit MQM Profile'; document.getElementById('peDeleteBtn').style.display = 'inline-flex'; }
+  else { editingProfile = JSON.parse(JSON.stringify(MQM_BLUEPRINT)); editingProfile.id = 'prof_' + Date.now(); document.getElementById('peModalTitle').textContent = 'New MQM Profile'; document.getElementById('peDeleteBtn').style.display = 'none'; }
+  document.getElementById('peName').value         = editingProfile.name;
+  document.getElementById('peDesc').value         = editingProfile.description;
+  document.getElementById('peThreshold').value    = editingProfile.passThreshold;
+  document.getElementById('pePromptExtras').value = editingProfile.promptExtras || '';
+  document.getElementById('peSevNeutral').value   = editingProfile.severityPenalties.Neutral;
+  document.getElementById('peSevMinor').value     = editingProfile.severityPenalties.Minor;
+  document.getElementById('peSevMajor').value     = editingProfile.severityPenalties.Major;
+  document.getElementById('peSevCritical').value  = editingProfile.severityPenalties.Critical;
+  renderCategoryEditor();
+  openModal('modalProfile');
+}
+
+function renderCategoryEditor() {
+  var cont = document.getElementById('peCategoriesContainer');
+  cont.innerHTML = editingProfile.categories.map(function(cat, cIdx) {
+    var bodyStyle = !cat.enabled ? ' style="opacity:.4; pointer-events:none;"' : '';
+    var rows = cat.subcategories.map(function(sub, sIdx) {
+      return '<div class="pe-sub-row"><label><input type="checkbox"' + (sub.enabled?' checked':'') + ' onchange="toggleSub(' + cIdx + ',' + sIdx + ',this.checked)"> ' + esc(sub.name) + '</label>' +
+        '<input type="number" step="0.1" min="0" value="' + sub.weight + '" onchange="updateSubWeight(' + cIdx + ',' + sIdx + ',this.value)"></div>';
+    }).join('');
+    return '<div class="pe-cat"><div class="pe-cat-header"><input type="checkbox"' + (cat.enabled?' checked':'') + ' onchange="toggleCat(' + cIdx + ',this.checked)"> ' + esc(cat.name) + '</div><div class="pe-cat-body"' + bodyStyle + '>' + rows + '</div></div>';
+  }).join('');
+}
+
+function toggleCat(ci, v)         { editingProfile.categories[ci].enabled = v; renderCategoryEditor(); }
+function toggleSub(ci, si, v)     { editingProfile.categories[ci].subcategories[si].enabled = v; }
+function updateSubWeight(ci,si,v) { editingProfile.categories[ci].subcategories[si].weight = parseFloat(v)||1.0; }
+
+function saveProfileFromEditor() {
+  editingProfile.name        = document.getElementById('peName').value.trim();
+  editingProfile.description = document.getElementById('peDesc').value.trim();
+  if (!editingProfile.name) { toast('Please enter a name.', 'warn'); return; }
+  editingProfile.passThreshold   = parseFloat(document.getElementById('peThreshold').value) || 99.0;
+  editingProfile.promptExtras    = document.getElementById('pePromptExtras').value.trim();
+  editingProfile.severityPenalties = {
+    Neutral:  parseFloat(document.getElementById('peSevNeutral').value)  || 0,
+    Minor:    parseFloat(document.getElementById('peSevMinor').value)    || 1,
+    Major:    parseFloat(document.getElementById('peSevMajor').value)    || 5,
+    Critical: parseFloat(document.getElementById('peSevCritical').value) || 10
+  };
+  showLoader('Saving?');
+  runGas('saveLQAProfile', [editingProfile], function(r) { hideLoader(); closeModal('modalProfile'); if (r && r.success) { lqaProfiles = r.profiles; renderProfiles(); toast('Saved.', 'success'); } else toast('Error.', 'error'); });
+}
+
+function deleteCurrentProfile() {
+  if (!confirm('Delete "' + editingProfile.name + '"?')) return;
+  showLoader('Deleting?');
+  runGas('deleteLQAProfile', [editingProfile.id], function(r) { hideLoader(); closeModal('modalProfile'); if (r && r.success) { lqaProfiles = r.profiles; renderProfiles(); toast('Deleted.', 'success'); } });
+}
+
+/* ?? REVIEW MODAL ?? */
+function openReview(reportId) {
+  currentReport = null;
+  for (var i = 0; i < allReports.length; i++) {
+    if (String(allReports[i].reportId) === String(reportId)) { currentReport = allReports[i]; break; }
+  }
+  if (!currentReport) { toast('Report not found.', 'error'); return; }
+  var passed = currentReport.passed || currentReport.score >= (currentReport.passThreshold || 99);
+  var langInfo = currentReport.targetLang && currentReport.targetLang !== 'all' ? ' ? ' + currentReport.targetLang : '';
+  document.getElementById('reviewModalMeta').textContent = currentReport.reportId + ' ? ' + String(currentReport.date || '').substring(0,10) + langInfo;
+  var h = '';
+  h += '<div class="review-score-bar" style="border-left:3px solid ' + (passed?'var(--green)':'var(--red)') + ';">';
+  h += '<div><div class="stat-label">MQM Score</div><div class="stat-val" style="color:' + (passed?'var(--green)':'var(--red)') + '; font-size:32px;">' + currentReport.score + '%</div></div>';
+  h += '<div style="text-align:right; font-size:12px; color:var(--t2);">';
+  h += '<div>Segments: <strong>' + (currentReport.totalSegments||'?') + '</strong></div>';
+  h += '<div>Issues: <strong>' + ((currentReport.issues||[]).length) + '</strong></div>';
+  h += '<div>Lang: <strong>' + esc(currentReport.targetLang || 'all') + '</strong></div>';
+  h += '<div>Profile: <strong>' + esc(currentReport.profileName||'') + '</strong></div>';
+  h += '</div></div>';
+  if (!currentReport.issues || !currentReport.issues.length) {
+    h += '<div class="tbl-card" style="text-align:center; padding:40px;"><i class="material-icons-outlined" style="font-size:36px; color:var(--green);">check_circle</i><div style="margin-top:10px; color:var(--t2);">No issues found.</div></div>';
+  } else {
+    currentReport.issues.forEach(function(iss) {
+      var svClass = { critical:'badge-red', major:'badge-amber', minor:'badge-blue', neutral:'badge-grey' }[(iss.severity||'').toLowerCase()] || 'badge-grey';
+      var stClass = iss.status === 'approved' ? 'badge-green' : (iss.status === 'rejected' ? 'badge-red' : 'badge-grey');
+      var isPreTrans = iss.rootCause === 'Pre-translation';
+      h += '<div class="issue-card">';
+      h += '<div class="issue-card-top"><div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">';
+      h += '<span class="badge ' + svClass + '">' + esc(iss.severity||'') + '</span>';
+      h += '<strong>' + esc(iss.category||'') + '</strong>';
+      h += '<span style="color:var(--t3);">? ' + esc(iss.subcategory||'') + '</span>';
+      h += '<span class="rc-badge' + (isPreTrans?' pretrans':'') + '">' + (isPreTrans?'Pre-translation':'Production') + '</span>';
+      h += '</div><span class="badge ' + stClass + '">' + (iss.status||'pending').toUpperCase() + '</span></div>';
+      h += '<div class="issue-seg-grid"><div><div class="issue-seg-label">Source</div>' + esc(iss.source||'') + '</div><div><div class="issue-seg-label">Target</div>' + esc(iss.target||'') + '</div></div>';
+      if (iss.explanation) h += '<div class="issue-reasoning"><strong style="font-size:10px; text-transform:uppercase; letter-spacing:0.4px;">AI Reasoning</strong><br>' + esc(iss.explanation) + '</div>';
+      if (iss.suggestion)  h += '<div class="issue-suggestion"><strong style="font-size:10px; text-transform:uppercase; letter-spacing:0.4px;">Suggestion</strong><br>' + esc(iss.suggestion) + '</div>';
+      h += '<div class="issue-actions">';
+      h += '<button class="btn btn-danger btn-sm" onclick="setIssueStatus(\'' + esc(String(iss.id)) + '\',\'rejected\')"><i class="material-icons-outlined">close</i>False positive</button>';
+      h += '<button class="btn btn-success btn-sm" onclick="setIssueStatus(\'' + esc(String(iss.id)) + '\',\'approved\')"><i class="material-icons-outlined">check</i>Confirm</button>';
+      h += '</div></div>';
+    });
+  }
+  document.getElementById('reviewModalContent').innerHTML = h;
+  openModal('modalReview');
+}
+
+function setIssueStatus(issueId, status) {
+  if (!currentReport || !currentReport.issues) return;
+  var iss = currentReport.issues.find(function(i) { return String(i.id) === String(issueId); });
+  if (iss) { iss.status = status; openReview(currentReport.reportId); google.script.run.updateIssueStatus(currentReport.reportId, issueId, status); }
+}
+
+/* ?? SYNC ?? */
+function openSyncModal() {
+  if (!currentReport || !currentReport.issues) { toast('Kein Report geladen.', 'warn'); return; }
+  var approved = currentReport.issues.filter(function(i) { return i.status === 'approved'; });
+  if (!approved.length) { toast('Keine best?tigten Issues.', 'warn'); return; }
+  document.getElementById('syncIssueCountText').textContent = approved.length + ' best?tigte Issue(s) werden eingetragen.';
+  document.getElementById('syncOverallFeedback').value = currentReport.summary || '';
+  openModal('modalSync');
+}
+
+function executeLqaSync() {
+  if (!currentReport) return;
+  var approved = (currentReport.issues || []).filter(function(i) { return i.status === 'approved'; });
+  if (!approved.length) { toast('Keine best?tigten Issues.', 'warn'); return; }
+  var feedback = document.getElementById('syncOverallFeedback').value.trim();
+  closeModal('modalSync');
+  showLoader('Syncing to Phrase LQA?');
+  runGas('syncIssuesToPhraseLQA', [currentReport.projectUid, approved, feedback], function(r) {
+    hideLoader();
+    if (r && r.success) toast(r.count + ' Issues synced.', 'success');
+    else toast('Sync Fehler: ' + (r ? r.error : 'unknown'), 'error');
+  });
+}
+
+/* ?? UTILS ?? */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function showLoader(txt, withProgress) {
+  document.getElementById('loaderText').textContent = txt || 'Loading?';
+  var pw = document.getElementById('loaderProgressWrap');
+  pw.style.display = withProgress ? 'flex' : 'none';
+  if (withProgress) { document.getElementById('progressFill').style.width = '0%'; document.getElementById('progressPct').textContent = '0%'; }
+  document.getElementById('loaderOverlay').classList.add('show');
+}
+function hideLoader() { document.getElementById('loaderOverlay').classList.remove('show'); }
+function updateProgress(msg, pct) {
+  document.getElementById('loaderText').textContent = msg || 'Working?';
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+}
+
+var _toastT = null;
+function toast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'show ' + (type || '');
+  if (_toastT) clearTimeout(_toastT);
+  _toastT = setTimeout(function() { el.className = ''; }, 4000);
+}
+
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>
